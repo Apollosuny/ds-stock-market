@@ -27,3 +27,7 @@ Running Airflow & Database
   MacOS: docker-compose up
   Window: docker compose up
 ```
+
+## Connect to Database container
+
+- Open url: http://localhost:5050
