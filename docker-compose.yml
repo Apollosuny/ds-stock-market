@@ -127,6 +127,8 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
+    volumes:
+      - ${HOME}/Workspace/dw-amazon-sales:/opt/project
     ports:
       - '8080:8080'
     healthcheck:
