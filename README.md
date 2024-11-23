@@ -37,3 +37,6 @@ Import file from plugins folder
   # Correct
   from models.* import abc
 ```
+  <!-- Login airflow -->
+  user: airflow
+  password: airflow
