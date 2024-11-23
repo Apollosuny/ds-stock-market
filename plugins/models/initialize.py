@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
-from models.models import base
+from models.schemas import base
 import time
 import logging
 from config.settings import POSTGRES_CONN_STRING
@@ -22,6 +22,5 @@ class Initialize:
 
 
 if __name__ == "__main__":
-    print(POSTGRES_CONN_STRING)
     Initialize(POSTGRES_CONN_STRING)
-    # Initialize("postgresql+psycopg2://admin:123456789@localhost:5432/dw-amazon-sales")
+# Initialize("postgresql+psycopg2://admin:123456789@localhost:5432/dw-amazon-sales")

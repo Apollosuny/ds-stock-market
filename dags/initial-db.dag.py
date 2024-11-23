@@ -1,6 +1,12 @@
 from airflow.decorators import dag, task
 from airflow.operators.bash import BashOperator
 import datetime
+from airflow.operators.python import PythonOperator
+from plugins.models.initialize import Initialize
+
+
+def initial_db():
+    Initialize("postgresql+psycopg2://admin:123456789@localhost:5432/dw-amazon-sales")
 
 
 @dag(
@@ -18,13 +24,12 @@ import datetime
 )
 def initialize():
 
-    create_db = BashOperator(
-        task_id="create_database",
-        bash_command='cd /opt/project && echo "Current directory: $(pwd)" && echo "Contents of /opt/project:" && ls -l /opt/project && python -m models.initialize',
-        do_xcom_push=True,
+    initialize_task = PythonOperator(
+        task_id="initialize_database",
+        python_callable=initial_db,
     )
 
-    create_db
+    initialize_task
 
 
 initialize()
