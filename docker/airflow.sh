@@ -20,7 +20,7 @@
 # Run airflow command in container
 #
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 set -euo pipefail
 
@@ -31,7 +31,7 @@ else
     dc="docker compose"
 fi
 
-export COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yml"
+export COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yaml"
 if [ $# -gt 0 ]; then
     exec $dc run --rm airflow-cli "${@}"
 else

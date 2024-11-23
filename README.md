@@ -27,3 +27,13 @@ Running Airflow & Database
   MacOS: docker-compose up
   Window: docker compose up
 ```
+
+Import file from plugins folder
+
+```bash
+  # Wrong
+  from plugins.models.* import abc
+
+  # Correct
+  from models.* import abc
+```
