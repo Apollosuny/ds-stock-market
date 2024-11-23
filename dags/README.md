@@ -1,3 +1,1 @@
-### Dags
-
-This folder for running airflow
+This file for running dags
