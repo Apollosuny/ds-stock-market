@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
-from models.models import base
+from plugins.models.models import base
 import time
 import logging
 from config.settings import POSTGRES_CONN_STRING

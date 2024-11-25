@@ -1,7 +1,7 @@
 FROM apache/airflow:2.9.3
 
 USER root
-RUN apt-get update && apt-get install -y git libpq-dev gcc
+RUN apt-get update && apt-get install -y --no-install-recommends git libpq-dev gcc
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_NO_CACHE_DIR=1
@@ -20,5 +20,6 @@ RUN --mount=type=bind,target=./requirements.txt,src=./requirements.txt \
 # Copy DAGs, include, and plugins
 COPY --chown=airflow:airflow ../dags /app/dags
 COPY --chown=airflow:airflow ../plugins /app/plugins
+COPY --chown=airflow:airflow ../config /app/config
 
 WORKDIR /app
