@@ -1,16 +1,17 @@
-from sqlalchemy.orm import declarative_base, relationship
+import enum
+
 from sqlalchemy import (
-    PrimaryKeyConstraint,
-    ForeignKey,
+    Boolean,
     Column,
     DateTime,
-    String,
-    Boolean,
     Enum,
+    ForeignKey,
     Integer,
+    PrimaryKeyConstraint,
+    String,
     func,
 )
-import enum
+from sqlalchemy.orm import declarative_base, relationship
 
 base = declarative_base()
 

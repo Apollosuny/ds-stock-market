@@ -1,9 +1,11 @@
-from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists, create_database
-from plugins.models.models import base
-import time
 import logging
+import time
+
+from sqlalchemy import create_engine
+from sqlalchemy_utils import create_database, database_exists
+
 from config.settings import POSTGRES_CONN_STRING
+from plugins.models.models import base
 
 
 class Initialize:
