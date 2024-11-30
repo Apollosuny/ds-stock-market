@@ -28,15 +28,12 @@ Running Airflow & Database
   Window: docker compose up
 ```
 
-Import file from plugins folder
+Access Database
 
 ```bash
-  # Wrong
-  from plugins.models.* import abc
+  # Access container
+  docker exec -it <container_id_or_name> bash
 
-  # Correct
-  from models.* import abc
+  # Access psql
+  psql -U <username> -d <database_name>
 ```
-  <!-- Login airflow -->
-  user: airflow
-  password: airflow

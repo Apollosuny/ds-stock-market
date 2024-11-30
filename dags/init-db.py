@@ -1,8 +1,7 @@
-from airflow.decorators import dag, task
-from airflow.operators.bash import BashOperator
+from airflow.decorators import dag
 import datetime
 from airflow.operators.python import PythonOperator
-from plugins.execute import test
+from plugins.models.initialize import initialize_db
 
 
 @dag(
@@ -22,7 +21,7 @@ def initialize():
 
     initialize_task = PythonOperator(
         task_id="initialize_database",
-        python_callable=test,
+        python_callable=initialize_db,
     )
 
     initialize_task
