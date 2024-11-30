@@ -1,1 +1,1 @@
-print('This is data warehouse project')
+print("This is data warehouse project")
