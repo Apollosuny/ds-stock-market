@@ -81,13 +81,17 @@ class Order(base):
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # relationships
-    customerId = Column(Integer, ForeignKey("customer.customerId"), nullable=False)
+    customerId = Column(
+        Integer, ForeignKey("customer.customerId"), nullable=False
+    )
     customer = relationship("Customer", back_populates="order")
 
 
 class OrderDetail(base):
     __tablename__ = "order_detail"
-    __table_args__ = (PrimaryKeyConstraint("orderId", "sku", name="orderId_sku"),)
+    __table_args__ = (
+        PrimaryKeyConstraint("orderId", "sku", name="orderId_sku"),
+    )
 
     orderId = Column(String, ForeignKey("order.orderId"), nullable=False)
     sku = Column(String, ForeignKey("product.sku"), nullable=False)
