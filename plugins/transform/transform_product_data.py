@@ -18,9 +18,6 @@ def process_data(csv_file_path, table_name, selected_columns, chunk_size=1000):
                 if_exists="append",
                 index=False,
             )
-            print(
-                f"Data from {csv_file_path} successfully loaded into {table_name}."
-            )
     except Exception as e:
         print(f"Error occurred: {e}")
 
