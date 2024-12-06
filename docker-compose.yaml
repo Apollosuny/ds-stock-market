@@ -65,6 +65,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - data-network
 
   redis:
     image: redis:latest
@@ -216,6 +218,7 @@ services:
       - ./logs:/sources/logs
       - ./plugins:/sources/plugins
       - ./config:/sources/config
+      - ./data:/sources/data
 
 volumes:
   pgdata:

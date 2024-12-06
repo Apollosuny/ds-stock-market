@@ -21,5 +21,6 @@ RUN --mount=type=bind,target=./requirements.txt,src=./requirements.txt \
 COPY --chown=airflow:airflow ../dags /app/dags
 COPY --chown=airflow:airflow ../plugins /app/plugins
 COPY --chown=airflow:airflow ../config /app/config
+COPY --chown=airflow:airflow ../data /app/data
 
 WORKDIR /app

@@ -82,7 +82,7 @@ class Order(base):
 
     # relationships
     customerId = Column(
-        Integer, ForeignKey("customer.customerId"), nullable=False
+        String, ForeignKey("customer.customerId"), nullable=False
     )
     customer = relationship("Customer", back_populates="order")
 
@@ -119,8 +119,9 @@ class ShippingCourierStatus(enum.Enum):
 
 class Shipping(base):
     __tablename__ = "shipping"
-    __table_args__ = (PrimaryKeyConstraint("orderId", name="orderId"),)
+    __table_args__ = (PrimaryKeyConstraint("shippingId", name="shippingId"),)
 
+    shippingId = Column(Integer, primary_key=True, autoincrement=True)
     orderId = Column(String, ForeignKey("order.orderId"), nullable=False)
     shipServiceLevel = Column(Enum(ShippingServiceLevel), nullable=False)
     courierStatus = Column(Enum(ShippingCourierStatus), nullable=False)
