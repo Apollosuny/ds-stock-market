@@ -1,0 +1,5 @@
+from plugins.transfrom_olap.dim_date import build_dim_date
+from plugins.transfrom_olap.dim_customer import build_dim_customer
+from plugins.transfrom_olap.dim_product import build_dim_product
+from plugins.transfrom_olap.dim_shipping import build_dim_shipping
+from plugins.transfrom_olap.fct_order import build_fact_order
