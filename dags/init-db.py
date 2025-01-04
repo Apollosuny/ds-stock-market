@@ -4,7 +4,6 @@ from airflow.decorators import dag
 from airflow.operators.python import PythonOperator
 
 from plugins.models.initialize import initialize_db
-from plugins.transform.transform_product_data import transform_product_data
 
 
 @dag(
@@ -26,12 +25,7 @@ def initialize():
         python_callable=initialize_db,
     )
 
-    transform_product_data_task = PythonOperator(
-        task_id="transform_product_data",
-        python_callable=transform_product_data,
-    )
-
-    initialize_task >> transform_product_data_task
+    initialize_task
 
 
 initialize()
