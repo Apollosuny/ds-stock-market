@@ -1,11 +1,11 @@
-import logging
+import os
+
 import pandas as pd
 import psycopg2
 import psycopg2.extras
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -13,11 +13,12 @@ load_dotenv()
 POSTGRES_CONN_STRING = os.getenv("DATABASE_URL")
 POSTGRES_SCHEMA = os.getenv("POSTGRESQL_SCHEMA_NAME")
 
+
 def build_product_data(logger, POSTGRES_CONN_STRING):
-    logger.info('Merging product data from CSV into PostgreSQL...')
+    logger.info("Merging product data from CSV into PostgreSQL...")
 
     # Đọc dữ liệu từ file CSV vào DataFrame
-    source_file_path = "/app/plugins/data/amazon-sale-report.csv"
+    source_file_path = "/app/data/amazon-sale-report.csv"
     try:
         df = pd.read_csv(source_file_path)
         logger.info(f"File loaded successfully: {source_file_path}")
@@ -35,29 +36,36 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
 
     # Kiểm tra các cột bắt buộc
     required_columns = ["SKU", "Style", "Category", "Size", "ASIN"]
-    missing_columns = [col for col in required_columns if col not in df.columns]
+    missing_columns = [
+        col for col in required_columns if col not in df.columns
+    ]
     if missing_columns:
-        logger.error(f"The CSV file is missing required columns: {missing_columns}")
+        logger.error(
+            f"The CSV file is missing required columns: {missing_columns}"
+        )
         return
 
     # Lọc và giữ lại chỉ các cột cần thiết
     df = df[required_columns]
-    
+
     # Đổi tên các cột để khớp với bảng `product`
-    df.rename(columns={
-        "SKU": "sku",            
-        "Style": "style",        
-        "Category": "category",  
-        "Size": "size",          
-        "ASIN": "asin"           
-    }, inplace=True)
+    df.rename(
+        columns={
+            "SKU": "sku",
+            "Style": "style",
+            "Category": "category",
+            "Size": "size",
+            "ASIN": "asin",
+        },
+        inplace=True,
+    )
 
     # Chỉ giữ các bản ghi có SKU duy nhất
     df = df.drop_duplicates(subset=["sku"])
 
     # Thêm các trường thời gian
-    df["create_at"] = pd.to_datetime("today")  
-    df["update_at"] = pd.to_datetime("today")  
+    df["create_at"] = pd.to_datetime("today")
+    df["update_at"] = pd.to_datetime("today")
 
     # Tên bảng tạm
     temp_table_id = "pg_temp.temp_product"
@@ -81,7 +89,9 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
             )
             """
             conn.execute(create_temp_table_query)
-            logger.info(f"Temporary table {temp_table_id} created successfully.")
+            logger.info(
+                f"Temporary table {temp_table_id} created successfully."
+            )
 
             # Chèn dữ liệu từ DataFrame vào bảng tạm
             data = list(df.itertuples(index=False, name=None))
@@ -89,7 +99,9 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
             INSERT INTO {temp_table_id} (sku, style, category, size, asin, create_at, update_at)
             VALUES %s
             """
-            psycopg2.extras.execute_values(conn.connection.cursor(), insert_query, data)
+            psycopg2.extras.execute_values(
+                conn.connection.cursor(), insert_query, data
+            )
             logger.info(f"Inserted {len(data)} rows into {temp_table_id}.")
 
             # Kiểm tra dữ liệu trong bảng tạm
@@ -108,9 +120,13 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
                 conn.execute(merge_query)
                 logger.info(f"Data merged into {dest_table_id} successfully.")
             except SQLAlchemyError as e:
-                logger.error(f"Error executing merge query: {e}", exc_info=True)
+                logger.error(
+                    f"Error executing merge query: {e}", exc_info=True
+                )
             except Exception as e:
-                logger.error(f"Unexpected error during merge: {e}", exc_info=True)
+                logger.error(
+                    f"Unexpected error during merge: {e}", exc_info=True
+                )
     except SQLAlchemyError as e:
         logger.error(f"Database error: {e}", exc_info=True)
     except Exception as e:

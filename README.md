@@ -37,3 +37,9 @@ Access Database
   # Access psql
   psql -U <username> -d <database_name>
 ```
+
+Data pipeline
+
+```bash
+  initial_database >> insert_data_to_db >> create_dim >> create_fact
+```
