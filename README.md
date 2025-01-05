@@ -38,6 +38,18 @@ Access Database
   psql -U <username> -d <database_name>
 ```
 
+Create User in Airflow
+
+```bash
+  airflow users create \
+    --username john_doe \
+    --firstname John \
+    --lastname Doe \
+    --role Admin \
+    --email john.doe@example.com \
+    --password abc
+```
+
 Data pipeline
 
 ```bash
