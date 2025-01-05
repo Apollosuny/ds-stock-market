@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.empty import EmptyOperator
 
 from plugins.transfrom_olap.run import MERGE_OLAP
 
@@ -38,6 +39,9 @@ with DAG(
     catchup=False,
     tags=["merge_olap"],
 ) as dag:
+    start = EmptyOperator(task_id="start")
+    end = EmptyOperator(task_id="end")
+
     transform_dim_task = PythonOperator(
         task_id="run_merge_olap_transform_dim",
         python_callable=run_merge_olap_transform_dim,
@@ -52,4 +56,4 @@ with DAG(
         dag=dag,
     )
 
-    transform_dim_task >> transform_fact_task
+    start >> transform_dim_task >> transform_fact_task >> end

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.empty import EmptyOperator
 
 from plugins.transform_erd.run import MERGE_ERD
 
@@ -31,9 +32,14 @@ with DAG(
     catchup=False,
     tags=["merge_erd"],
 ) as dag:
+    start = EmptyOperator(task_id="start")
+    end = EmptyOperator(task_id="end")
+
     transform_task = PythonOperator(
         task_id="run_merge_erd_transform",
         python_callable=run_merge_erd_transform,
         op_args=[None],
         dag=dag,
     )
+
+    start >> transform_task >> end
