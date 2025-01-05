@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+import numpy as np
 import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
@@ -35,18 +36,26 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
         return
 
     # Kiểm tra các cột bắt buộc
-    required_columns = ["SKU", "Style", "Category", "Size", "ASIN"]
-    missing_columns = [
-        col for col in required_columns if col not in df.columns
-    ]
+    required_columns = ["SKU", "Style", "Category", "Size", "ASIN", "Amount", "Qty"]
+    missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
-        logger.error(
-            f"The CSV file is missing required columns: {missing_columns}"
-        )
+        logger.error(f"The CSV file is missing required columns: {missing_columns}")
         return
 
     # Lọc và giữ lại chỉ các cột cần thiết
     df = df[required_columns]
+
+    # Xử lý giá
+    df["price"] = np.where(
+        df["Qty"] == 0,
+        df["Amount"].fillna(
+            0
+        ),  # Nếu Qty == 0 thì dùng Amount, nếu Amount NaN thì dùng 0
+        np.where(df["Amount"].isna(), 0, df["Amount"] / df["Qty"]),
+    )  # Nếu Amount NaN thì giá = 0
+
+    # Loại bỏ cột Amount và Qty
+    df.drop(columns=["Amount", "Qty"], inplace=True)
 
     # Đổi tên các cột để khớp với bảng `product`
     df.rename(
@@ -84,24 +93,21 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
                 category VARCHAR,
                 size VARCHAR,
                 asin VARCHAR,
+                price NUMERIC,
                 create_at TIMESTAMP,
                 update_at TIMESTAMP
             )
             """
             conn.execute(create_temp_table_query)
-            logger.info(
-                f"Temporary table {temp_table_id} created successfully."
-            )
+            logger.info(f"Temporary table {temp_table_id} created successfully.")
 
             # Chèn dữ liệu từ DataFrame vào bảng tạm
             data = list(df.itertuples(index=False, name=None))
             insert_query = f"""
-            INSERT INTO {temp_table_id} (sku, style, category, size, asin, create_at, update_at)
+            INSERT INTO {temp_table_id} (sku, style, category, size, asin, price, create_at, update_at)
             VALUES %s
             """
-            psycopg2.extras.execute_values(
-                conn.connection.cursor(), insert_query, data
-            )
+            psycopg2.extras.execute_values(conn.connection.cursor(), insert_query, data)
             logger.info(f"Inserted {len(data)} rows into {temp_table_id}.")
 
             # Kiểm tra dữ liệu trong bảng tạm
@@ -112,21 +118,17 @@ def build_product_data(logger, POSTGRES_CONN_STRING):
             # Chèn dữ liệu từ bảng tạm vào bảng đích với `SELECT DISTINCT`
             dest_table_id = f"{POSTGRES_SCHEMA}.product"
             merge_query = f"""
-            INSERT INTO {dest_table_id} (sku, style, category, size, asin, "createdAt", "updatedAt")
-            SELECT DISTINCT s.sku, s.style, s.category, s.size, s.asin, CURRENT_DATE, CURRENT_DATE
+            INSERT INTO {dest_table_id} (sku, style, category, size, asin, price, "createdAt", "updatedAt")
+            SELECT DISTINCT s.sku, s.style, s.category, s.size, s.asin, s.price, CURRENT_DATE, CURRENT_DATE
             FROM {temp_table_id} s
             """
             try:
                 conn.execute(merge_query)
                 logger.info(f"Data merged into {dest_table_id} successfully.")
             except SQLAlchemyError as e:
-                logger.error(
-                    f"Error executing merge query: {e}", exc_info=True
-                )
+                logger.error(f"Error executing merge query: {e}", exc_info=True)
             except Exception as e:
-                logger.error(
-                    f"Unexpected error during merge: {e}", exc_info=True
-                )
+                logger.error(f"Unexpected error during merge: {e}", exc_info=True)
     except SQLAlchemyError as e:
         logger.error(f"Database error: {e}", exc_info=True)
     except Exception as e:

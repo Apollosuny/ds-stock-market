@@ -25,6 +25,7 @@ class Product(base):
     category = Column(String)
     size = Column(String)
     asin = Column(String)
+    price = Column(Float)
     createdAt = Column(DateTime, default=func.now())
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -47,7 +48,6 @@ class Customer(base):
     orders = relationship("Order", back_populates="customer")
 
 
-
 class Order(base):
     __tablename__ = "order"
 
@@ -64,11 +64,14 @@ class Order(base):
 
     # relationships
     customerId = Column(
-        Integer, ForeignKey("customer.customerId"), nullable=False  # Changed to Integer for consistency
+        Integer,
+        ForeignKey("customer.customerId"),
+        nullable=False,  # Changed to Integer for consistency
     )
     customer = relationship("Customer", back_populates="order")
     order_detail = relationship("OrderDetail", back_populates="order")
     shipping = relationship("Shipping", back_populates="order")
+
 
 class OrderDetail(base):
     __tablename__ = "order_detail"
@@ -105,6 +108,7 @@ class Shipping(base):
     # relationships
     order = relationship("Order", back_populates="shipping")
 
+
 # Create dim/fact table
 class FactOrder(base):
     __tablename__ = "fct_order"
@@ -126,6 +130,7 @@ class FactOrder(base):
     dim_shipping = relationship("DimShipping", back_populates="fct_order")
     dim_date = relationship("DimDate", back_populates="fct_order")
 
+
 class DimShipping(base):
     __tablename__ = "dim_shipping"
 
@@ -138,6 +143,7 @@ class DimShipping(base):
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
 
     fct_order = relationship("FactOrder", back_populates="dim_shipping")
+
 
 class DimCustomer(base):
     __tablename__ = "dim_customer"
@@ -153,6 +159,7 @@ class DimCustomer(base):
 
     fct_order = relationship("FactOrder", back_populates="dim_customer")
 
+
 class DimProduct(base):
     __tablename__ = "dim_product"
 
@@ -166,6 +173,7 @@ class DimProduct(base):
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
 
     fct_order = relationship("FactOrder", back_populates="dim_product")
+
 
 class DimDate(base):
     __tablename__ = "dim_date"
@@ -187,6 +195,3 @@ class DimDate(base):
     date = Column(DateTime)
 
     fct_order = relationship("FactOrder", back_populates="dim_date")
-
-
-
