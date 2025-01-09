@@ -11,8 +11,11 @@ load_dotenv()
 POSTGRES_CONN_STRING = os.getenv("DATABASE_URL")
 POSTGRES_SCHEMA = os.getenv("POSTGRESQL_SCHEMA_NAME")
 
+
 def build_fact_order(logger, POSTGRES_CONN_STRING):
-    logger.info("Merging order data into PostgreSQL fct_order using SCD Type 1 with LEFT JOIN...")
+    logger.info(
+        "Merging order data into PostgreSQL fct_order using SCD Type 1 with LEFT JOIN..."
+    )
 
     # Define schema
     desk = f"{POSTGRES_SCHEMA}.fct_order"
@@ -32,10 +35,11 @@ def build_fact_order(logger, POSTGRES_CONN_STRING):
             # Query for SCD Type 1 (Overwrite)
             merge_query = f"""
             INSERT INTO {desk} (
-                "orderId", "productId", "customerId", "shippingId", "dateId", quantity, amount, "createdAt", "updatedAt"
+                "orderId", "promotionIds", "productId", "customerId", "shippingId", "dateId", quantity, amount, "createdAt", "updatedAt"
             )
             SELECT 
                 o."orderId",
+                o."promotionIds",
                 p.sku AS "productId",
                 c."customerId",
                 s."shippingId",

@@ -115,6 +115,7 @@ class FactOrder(base):
 
     id = Column(Integer, primary_key=True)
     orderId = Column(String, nullable=False)
+    promotionIds = Column(String)
     productId = Column(String, ForeignKey("dim_product.sku"), nullable=False)
     customerId = Column(Integer, ForeignKey("dim_customer.customerId"), nullable=False)
     shippingId = Column(Integer, ForeignKey("dim_shipping.shippingId"), nullable=False)
