@@ -54,7 +54,6 @@ def build_fact_order(logger, POSTGRES_CONN_STRING):
             LEFT JOIN {source_customer} c ON o."customerId" = c."customerId"
             LEFT JOIN {source_shipping} s ON o."orderId" = s."orderId"
             LEFT JOIN {source_date} d ON DATE(o."date") = d."date";
-
             """
 
             # Execute the query

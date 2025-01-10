@@ -13,8 +13,9 @@ POSTGRES_SCHEMA = os.getenv("POSTGRESQL_SCHEMA_NAME")
 
 from sqlalchemy import text
 
+
 def build_dim_date(logger, POSTGRES_CONN_STRING):
-    logger.info('Merging order details data into PostgreSQL dim_date...')
+    logger.info("Merging order details data into PostgreSQL dim_date...")
 
     desk = f"{POSTGRES_SCHEMA}.dim_date"
 
@@ -51,9 +52,8 @@ def build_dim_date(logger, POSTGRES_CONN_STRING):
                     EXTRACT(EPOCH FROM date_value) AS unix_timestamp,
                     date_value
                 FROM date_range;
-
             """
-            
+
             # Chạy câu lệnh SQL bằng cách sử dụng `text()`
             conn.execute(text(merge_query))
             logger.info("Data merged into dim_date successfully.")
@@ -65,4 +65,3 @@ def build_dim_date(logger, POSTGRES_CONN_STRING):
     finally:
         engine.dispose()
         logger.info("PostgreSQL connection closed.")
-
